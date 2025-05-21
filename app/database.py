@@ -13,3 +13,11 @@ def add_name(name):
     c.execute("INSERT INTO names VALUES (?)", (name,))
     conn.commit()
     conn.close()
+
+def get_names():
+    conn = sqlite3.connect('names.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM names")
+    names = c.fetchall()
+    conn.close()
+    return names

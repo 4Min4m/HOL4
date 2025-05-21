@@ -1,20 +1,17 @@
-name: Python DevOps Pipeline
-
-on: [push]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install Deps
-        run: |
-          pip install -r infra/requirements.txt
-          pip install docker kubernetes
-      - name: Run Python Pipeline
-        run: python ci_cd_pipeline.py
-        env:
-          KUBECONFIG: ${{ secrets.KUBE_CONFIG }}
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-python@v4
+    with:
+      python-version: '3.9'
+  - name: Install dependencies
+    run: |
+      python -m pip install --upgrade pip
+      pip install -r infra/requirements.txt
+  - name: Run tests
+    run: |
+      export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
+      pytest tests/
+  - name: Run Pipeline
+    run: |
+      export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
+      python ci_cd_pipeline.py

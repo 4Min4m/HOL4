@@ -1,7 +1,12 @@
 FROM python:3.9-slim
+
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY app/ .
-EXPOSE 5000
-CMD ["python", "app.py"]
+
+# نصب ابتدایی ترین requirements اول
+COPY infra/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# کپی بقیه فایل‌ها
+COPY . .
+
+CMD ["python", "app/app.py"]
