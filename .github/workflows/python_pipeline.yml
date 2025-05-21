@@ -10,6 +10,11 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -23,6 +28,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r infra/requirements.txt
         pip install pytest docker kubernetes
+    
+    - name: Set up Docker
+      run: |
+        sudo groupadd docker || true
+        sudo usermod -aG docker $USER
+        newgrp docker
+        docker --version
     
     - name: Run tests
       run: |

@@ -7,6 +7,8 @@ COPY infra/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # کپی بقیه فایل‌ها
-COPY . .
+COPY app/ ./app/
+COPY tests/ ./tests/
+COPY ci_cd_pipeline.py ./
 
 CMD ["python", "app/app.py"]

@@ -15,8 +15,24 @@ def run_cmd(command):
         return False
 
 def build_and_push():
-    client = docker.from_env()
-    client.images.build(path=".", tag="hello-devops:latest")
+    try:
+        # اضافه کردن تنظیمات Docker برای GitHub Actions
+        client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+        
+        # Build image
+        client.images.build(
+            path=".",
+            tag="hello-devops:latest",
+            dockerfile="infra/Dockerfile"
+        )
+        
+        # Push to registry (اختیاری - نیاز به تنظیمات اضافه دارد)
+        # client.images.push("hello-devops:latest")
+        
+        return True
+    except Exception as e:
+        print(f"❌ Docker error: {str(e)}")
+        return False
 
 def deploy_k8s():
     config.load_kube_config()
