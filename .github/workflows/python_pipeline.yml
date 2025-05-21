@@ -1,17 +1,35 @@
-steps:
-  - uses: actions/checkout@v4
-  - uses: actions/setup-python@v4
-    with:
-      python-version: '3.9'
-  - name: Install dependencies
-    run: |
-      python -m pip install --upgrade pip
-      pip install -r infra/requirements.txt
-  - name: Run tests
-    run: |
-      export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
-      pytest tests/
-  - name: Run Pipeline
-    run: |
-      export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
-      python ci_cd_pipeline.py
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r infra/requirements.txt
+        pip install pytest docker kubernetes
+    
+    - name: Run tests
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
+        pytest tests/
+    
+    - name: Run CI/CD Pipeline
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE
+        python ci_cd_pipeline.py
