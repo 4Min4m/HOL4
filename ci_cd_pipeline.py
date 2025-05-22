@@ -35,10 +35,34 @@ def build_and_push():
         return False
 
 def deploy_k8s():
-    config.load_kube_config()
-    k8s_client = kubernetes.client.AppsV1Api()
-    with open("infra/k8s/deployment.yaml") as f:
-        dep = kubernetes.utils.create_from_yaml(k8s_client, f.read())
+    try:
+        # استفاده از تنظیمات داخل کلاستر برای GitHub Actions
+        config.load_incluster_config()
+        
+        k8s_client = kubernetes.client.AppsV1Api()
+        
+        # اعمال deployment
+        with open("infra/k8s/deployment.yaml") as f:
+            dep = yaml.safe_load(f)
+            k8s_client.create_namespaced_deployment(
+                body=dep,
+                namespace="default"
+            )
+        
+        # اعمال service
+        with open("infra/k8s/service.yaml") as f:
+            svc = yaml.safe_load(f)
+            k8s_client.create_namespaced_service(
+                body=svc,
+                namespace="default"
+            )
+            
+        print("✅ Successfully deployed to Kubernetes")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Kubernetes deployment error: {str(e)}")
+        return False
 
 if __name__ == "__main__":
     print("🚀 Starting DevOps Pipeline")
